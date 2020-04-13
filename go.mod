@@ -2,4 +2,9 @@ module github.com/bhoriuchi/go-activedirectory
 
 go 1.13
 
-require gopkg.in/ldap.v3 v3.1.0
+require (
+	github.com/miekg/dns v1.1.29
+	github.com/ns1/gokrb5/v8 v8.2.2
+	github.com/ns1/tsig v0.0.0-20200319214757-239d4f5022c4
+	gopkg.in/ldap.v3 v3.1.0
+)

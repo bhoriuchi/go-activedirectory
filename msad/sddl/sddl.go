@@ -15,6 +15,7 @@ type SDDL struct {
 	OffsetDacl  int    `json:"offsetDacl"`
 	Owner       string `json:"owner"`
 	Group       string `json:"group"`
+	DACL        *DACL  `json:"dacl"`
 }
 
 // NewSDDL creates a new sddl
@@ -26,6 +27,8 @@ func NewSDDL(descriptor []byte) (sddl *SDDL, err error) {
 
 // Parse parses the descriptor
 func (c *SDDL) Parse(descriptor []byte) (err error) {
+	var daclb []byte
+
 	h := hex.EncodeToString(descriptor)
 	if c.Revision, err = common.Hexdec(common.Substr(h, 0, 2)); err != nil {
 		return
@@ -57,5 +60,11 @@ func (c *SDDL) Parse(descriptor []byte) (err error) {
 		}
 	}
 
-	return nil
+	if daclb, err = hex.DecodeString(h[c.OffsetDacl:]); err != nil {
+		return
+	} else if c.DACL, err = NewDACL(daclb); err != nil {
+		return
+	}
+
+	return
 }
