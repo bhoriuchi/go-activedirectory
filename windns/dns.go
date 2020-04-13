@@ -237,9 +237,15 @@ func (c *Client) Update(host, zone string, oReqs, nReqs []string) (r *dnsc.Msg, 
 }
 
 // Lookup looks up a value
-func (c *Client) Lookup(host, value string) (data string, r *dnsc.Msg, tt time.Duration, err error) {
+func (c *Client) Lookup(host, value string, rrType ...uint16) (data string, r *dnsc.Msg, tt time.Duration, err error) {
 	msg := new(dnsc.Msg)
-	msg.SetQuestion(dnsc.Fqdn(value), dnsc.TypeANY)
+
+	t := dnsc.TypeANY
+	if len(rrType) > 0 {
+		t = rrType[0]
+	}
+
+	msg.SetQuestion(dnsc.Fqdn(value), t)
 	r, tt, err = c.Exchange(host, msg)
 
 	if len(r.Answer) == 0 {
@@ -263,8 +269,8 @@ func (c *Client) Exchange(host string, msg *dnsc.Msg) (r *dnsc.Msg, tt time.Dura
 	return
 }
 
-// FQDNJoin joins the name and zone to create an fqdn
-func fqdnJoin(name, zone string) (fqdn string) {
+// FqdnJoin joins the name and zone to create an fqdn
+func FqdnJoin(name, zone string) (fqdn string) {
 	fqdn = dnsc.Fqdn(fmt.Sprintf(
 		"%s.%s",
 		strings.Trim(name, "."),
